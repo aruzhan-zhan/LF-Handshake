@@ -1,0 +1,31 @@
+target Cpp;
+
+/**
+ * The 'Source' reactor sends a message.
+ */
+reactor Source {
+    output out: std::string;
+    timer t(0, 1s);
+
+    reaction(t) -> out {=
+        std::cout << "Source: Sending handshake request at " << get_elapsed_logical_time() << std::endl;
+        out.set("Hello from Aruzhan");
+    =}
+}
+
+/**
+ * The 'Sink' reactor receives the message.
+ */
+reactor Sink {
+    input in: std::string;
+
+    reaction(in) {=
+        std::cout << "Sink: Received handshake: " << *in.get() << std::endl;
+    =}
+}
+
+main reactor {
+    s = new Source();
+    k = new Sink();
+    s.out -> k.in; // Connect the two components
+}
